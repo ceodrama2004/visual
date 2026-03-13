@@ -48,15 +48,16 @@
         }
 
         h1 {
-            font-size: 36px;
-            line-height: 1.1;
-            margin: 0;
-            font-weight: 800;
-            letter-spacing: -1.5px;
-            background: var(--premium-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    font-size: 36px;
+    line-height: 1.1;
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    background: var(--premium-gradient);
+    background-clip: text; /* Стандартное свойство */
+    -webkit-background-clip: text; /* Для Chrome и Safari */
+    -webkit-text-fill-color: transparent;
+}
 
         /* Сетка модулей */
         .modules-grid {
