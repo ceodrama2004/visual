@@ -205,22 +205,45 @@
         }
 
         // ЗАПУСК АНАЛИЗА
-        function startAI() {
-            let user = document.getElementById('username').value;
-            if(!user) return tg.showAlert("Введите никнейм!");
-            
-            tg.HapticFeedback.notificationOccurred('success');
-            
+        async function startAI() {
+    let user = document.getElementById('username').value;
+    if(!user) return tg.showAlert("Введите никнейм!");
+    
+    // Получаем реальный ID пользователя из Telegram
+    let userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 0;
+
+    tg.HapticFeedback.notificationOccurred('success');
+    tg.MainButton.setText("SENDING TO AI...").show();
+
+    try {
+        // fetch отправляет данные на твой запущенный server.py
+        const response = await fetch('http://127.0.0.1:8000/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                username: user, 
+                user_id: userId 
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
             tg.showConfirm(
-                `Запрос на анализ ${user} принят.\n\n🤖 ИИ начал сбор данных.\n\n✅ Отчет придет в чат и сохранится в разделе "Отчеты".`,
+                `Успешно!\n\n${result.message}`,
                 function(ok) {
-                    if(ok) {
-                        showPage('inst-page');
-                        document.getElementById('username').value = '';
-                    }
+                    if(ok) showPage('inst-page');
                 }
             );
         }
+    } catch (error) {
+        // Если server.py не запущен, вылетит эта ошибка
+        tg.showAlert("Ошибка: Сервер не отвечает. Проверь, запущен ли server.py в VS Code");
+        console.error(error);
+    } finally {
+        tg.MainButton.hide();
+    }
+}
     </script>
 </body>
 </html>
