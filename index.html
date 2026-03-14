@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>DMH - Premium Marketing Tool</title>
+    <title>DMH - Digital Marketing Helper</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #050505; /* Еще более глубокий черный */
-            --card-bg: rgba(22, 27, 34, 0.6);
+            --bg-color: #050505;
+            --card-bg: rgba(22, 27, 34, 0.7);
             --accent-color: #2f81f7;
             --text-main: #ffffff;
             --text-dim: #8b949e;
@@ -20,195 +20,112 @@
             font-family: -apple-system, system-ui, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Центрируем всё */
+            margin: 0; padding: 20px;
+            overflow-x: hidden;
             min-height: 100vh;
         }
 
-        /* Премиальный заголовок */
-        header {
-            text-align: center;
-            margin-top: 40px;
-            margin-bottom: 50px;
-            max-width: 300px;
+        /* [1] PRELOADER */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 1000;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        .loader-logo { font-size: 42px; font-weight: 800; letter-spacing: -2px; background: var(--premium-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
+        .loader-bar { width: 120px; height: 1px; background: rgba(255,255,255,0.1); position: relative; overflow: hidden; }
+        .loader-bar::after { content: ''; position: absolute; left: -100%; width: 100%; height: 100%; background: var(--accent-color); animation: load 1.6s infinite; }
+        @keyframes load { 0% { left: -100%; } 100% { left: 100%; } }
 
-        .welcome-badge {
-            font-size: 11px;
-            color: var(--accent-color);
-            text-transform: uppercase;
-            letter-spacing: 4px; /* Большой интервал - признак дорогого дизайна */
-            font-weight: 700;
-            margin-bottom: 16px;
-            display: block;
-            opacity: 0.8;
+        /* [2] MAIN HUB (CENTERED) */
+        #main-hub { opacity: 0; transform: translateY(15px); transition: all 0.8s ease; display: flex; flex-direction: column; align-items: center; }
+        header { text-align: center; margin: 40px 0 50px 0; }
+        .badge { font-size: 10px; color: var(--accent-color); letter-spacing: 3px; text-transform: uppercase; font-weight: 700; margin-bottom: 12px; display: block; }
+        h1 { font-size: 36px; line-height: 1.1; font-weight: 800; letter-spacing: -1.5px; background: var(--premium-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 380px; }
+        .hub-item { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 28px; padding: 24px 10px; display: flex; flex-direction: column; align-items: center; gap: 12px; transition: 0.3s; }
+        .hub-item:active { transform: scale(0.94); background: rgba(47, 129, 247, 0.1); }
+        .hub-icon { width: 48px; height: 48px; background: rgba(47, 129, 247, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--accent-color); font-size: 20px; }
+
+        /* [3] INSTAGRAM HELPER PAGE (FULL SCREEN) */
+        #inst-helper-page { display: none; opacity: 0; transform: translateX(20px); transition: all 0.4s ease; width: 100%; }
+        .page-header { margin-bottom: 30px; }
+        .back-link { color: var(--text-dim); font-size: 14px; text-decoration: none; display: flex; align-items: center; gap: 6px; margin-bottom: 20px; }
+
+        /* ДЛИННЫЕ КНОПКИ */
+        .tool-list { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .tool-button { 
+            background: var(--card-bg); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            padding: 20px; 
+            border-radius: 22px; 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+            transition: 0.2s;
+            cursor: pointer;
         }
-
-        h1 {
-    font-size: 36px;
-    line-height: 1.1;
-    margin: 0;
-    font-weight: 800;
-    letter-spacing: -1.5px;
-    background: var(--premium-gradient);
-    background-clip: text; /* Стандартное свойство */
-    -webkit-background-clip: text; /* Для Chrome и Safari */
-    -webkit-text-fill-color: transparent;
-}
-
-        /* Сетка модулей */
-        .modules-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .module-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 24px 16px;
-            border-radius: 28px;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Центрируем иконку и текст внутри карточки */
-            gap: 14px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-        }
-
-        .module-card:active {
-            transform: scale(0.92);
-            background: rgba(47, 129, 247, 0.1);
-            border-color: var(--accent-color);
-        }
-
-        .module-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, rgba(47, 129, 247, 0.2) 0%, rgba(47, 129, 247, 0.05) 100%);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-color);
-            font-size: 20px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        }
-
-        .module-card h3 {
-            margin: 0;
-            font-size: 14px;
-            font-weight: 600;
-            color: #e2e8f0;
-            letter-spacing: -0.2px;
-        }
-
-        /* Экран инструмента */
-        #inst-tool { 
-            display: none; 
-            width: 100%;
-            animation: slideUp 0.4s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .analysis-block {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        input {
-            width: 100%;
-            background: #000000;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px;
-            border-radius: 14px;
-            color: white;
-            margin: 20px 0;
-            box-sizing: border-box;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .btn-analyze {
-            background: #ffffff;
-            color: #000000;
-            border: none;
-            width: 100%;
-            padding: 18px;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 16px;
-            letter-spacing: -0.5px;
-        }
-
-        .back-btn {
-            background: rgba(255,255,255,0.05);
-            border: none;
-            color: var(--text-dim);
-            padding: 10px 20px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            font-size: 13px;
-            align-self: flex-start;
-        }
+        .tool-button:active { transform: scale(0.98); background: rgba(255,255,255,0.03); }
+        .tool-info { flex-grow: 1; }
+        .tool-info h4 { margin: 0; font-size: 16px; font-weight: 600; }
+        .tool-info p { margin: 4px 0 0 0; font-size: 12px; color: var(--text-dim); }
+        .tool-chevron { color: var(--text-dim); font-size: 14px; }
 
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="main-screen" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+    <div id="loader">
+        <div class="loader-logo">DMH</div>
+        <div class="loader-bar"></div>
+    </div>
+
+    <div id="main-hub">
         <header>
-            <span class="welcome-badge">Welcome to DMH</span>
-            <h1>Digital Marketing Helper</h1>
+            <span class="badge">Welcome to DMH</span>
+            <h1>Digital Marketing<br>Helper</h1>
         </header>
 
-        <div class="modules-grid">
-            <div class="module-card" onclick="openModule('inst-tool')">
-                <div class="module-icon">
-                    <i class="fa-brands fa-instagram"></i>
-                </div>
-                <h3>Instagram<br>Helper</h3>
+        <div class="hub-grid">
+            <div class="hub-item" onclick="openInstHelper()">
+                <div class="hub-icon"><i class="fa-brands fa-instagram"></i></div>
+                <span style="font-size: 13px; font-weight: 600;">Instagram Helper</span>
             </div>
-
-            <div class="module-card" style="opacity: 0.3; filter: grayscale(1);">
-                <div class="module-icon"><i class="fa-solid fa-globe"></i></div>
-                <h3>Web Site<br>Analyzer</h3>
+            <div class="hub-item" style="opacity: 0.3;">
+                <div class="hub-icon"><i class="fa-solid fa-globe"></i></div>
+                <span style="font-size: 13px; font-weight: 600;">Web Analyzer</span>
             </div>
         </div>
     </div>
 
-    <div id="inst-tool">
-        <button class="back-btn" onclick="goBack()">← Назад</button>
-        
-        <div class="analysis-block">
-            <div style="text-align: center;">
-                <span style="color: var(--accent-color); font-size: 11px; font-weight: 700; letter-spacing: 2px;">AI POWERED</span>
-                <h2 style="margin: 10px 0; font-size: 24px;">Instagram Helper</h2>
-                <p style="color: var(--text-dim); font-size: 14px;">Анализ торгового предложения</p>
+    <div id="inst-helper-page">
+        <div class="page-header">
+            <div class="back-link" onclick="closeInstHelper()">
+                <i class="fa-solid fa-chevron-left"></i> Назад в Hub
             </div>
-            
-            <input type="text" id="target-link" placeholder="@username">
-            <button class="btn-analyze" onclick="runAnalysis()">АНАЛИЗИРОВАТЬ</button>
+            <span class="badge" style="margin-left: 0;">Service Active</span>
+            <h2 style="font-size: 32px; margin: 5px 0 0 0; letter-spacing: -1px;">Instagram Helper</h2>
+            <p style="color: var(--text-dim); font-size: 14px; margin-top: 8px;">Выберите инструмент ассистента</p>
         </div>
 
-        <div id="results" class="hidden" style="margin-top: 20px; width: 100%;">
-            <div class="analysis-block">
-                <p id="res-text" style="font-size: 14px; line-height: 1.6; color: #cbd5e1;"></p>
+        <div class="tool-list">
+            <div class="tool-button" onclick="startAnalytics()">
+                <div class="hub-icon" style="background: rgba(47, 129, 247, 0.15);"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                <div class="tool-info">
+                    <h4>Аналитика</h4>
+                    <p>Анализ конкурентов, офферов и стратегии</p>
+                </div>
+                <i class="fa-solid fa-chevron-right tool-chevron"></i>
+            </div>
+
+            <div class="tool-button" style="opacity: 0.4;">
+                <div class="hub-icon"><i class="fa-solid fa-pen-nib"></i></div>
+                <div class="tool-info">
+                    <h4>AI Copywriter</h4>
+                    <p>Генерация постов и контент-плана</p>
+                </div>
             </div>
         </div>
     </div>
@@ -219,32 +136,44 @@
         tg.backgroundColor = "#050505";
         tg.headerColor = "#050505";
 
-        function openModule(id) {
-            document.getElementById('main-screen').classList.add('hidden');
-            document.getElementById(id).style.display = 'block';
-        }
-
-        function goBack() {
-            document.getElementById('inst-tool').style.display = 'none';
-            document.getElementById('main-screen').classList.remove('hidden');
-        }
-
-        function runAnalysis() {
-            let link = document.getElementById('target-link').value;
-            if(!link) return tg.showAlert("Введите никнейм!");
-            
-            tg.MainButton.setParams({
-                text: "GENERATING INSIGHTS...",
-                color: "#ffffff",
-                text_color: "#000000"
-            }).show();
-            
+        // ЛОГИКА ЗАГРУЗКИ
+        window.onload = () => {
             setTimeout(() => {
-                document.getElementById('results').classList.remove('hidden');
-                document.getElementById('res-text').innerHTML = "<b>Результат:</b><br>Ваш конкурент делает ставку на визуальный сторителлинг. В шапке отсутствует ссылка на быстрый заказ, что является вашей точкой роста.";
-                tg.MainButton.hide();
-                tg.HapticFeedback.impactOccurred('heavy');
-            }, 2500);
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('main-hub').style.opacity = '1';
+                    document.getElementById('main-hub').style.transform = 'translateY(0)';
+                }, 600);
+            }, 1500);
+        };
+
+        // НАВИГАЦИЯ
+        function openInstHelper() {
+            tg.HapticFeedback.impactOccurred('medium');
+            const hub = document.getElementById('main-hub');
+            const page = document.getElementById('inst-helper-page');
+            
+            hub.style.display = 'none';
+            page.style.display = 'block';
+            setTimeout(() => {
+                page.style.opacity = '1';
+                page.style.transform = 'translateX(0)';
+            }, 50);
+        }
+
+        function closeInstHelper() {
+            tg.HapticFeedback.impactOccurred('light');
+            const hub = document.getElementById('main-hub');
+            const page = document.getElementById('inst-helper-page');
+            
+            page.style.display = 'none';
+            hub.style.display = 'flex';
+        }
+
+        function startAnalytics() {
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert("Запуск модуля 'Аналитика'. Здесь будет ввод никнейма.");
         }
     </script>
 </body>
