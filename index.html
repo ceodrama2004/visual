@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>DMH - Premium Marketing Tool</title>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         :root {
             --bg-color: #050505;
@@ -20,20 +22,30 @@
             font-family: -apple-system, system-ui, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0; padding: 20px;
+            margin: 0; 
+            padding: 20px;
             overflow-x: hidden;
             min-height: 100vh;
         }
 
-        /* [1] PRELOADER */
+        /* [1] PRELOADER СТИЛИ */
         #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-color); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 1000;
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background: var(--bg-color); 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000;
             transition: opacity 0.6s ease;
         }
+        
         .loader-logo { 
-            font-size: 42px; font-weight: 800; letter-spacing: -2px; 
+            font-size: 42px; 
+            font-weight: 800; 
+            letter-spacing: -2px; 
             background: var(--premium-gradient); 
             background-clip: text;
             -webkit-background-clip: text; 
@@ -41,52 +53,137 @@
             margin-bottom: 20px; 
         }
 
-        /* [2] MAIN HUB */
-        #main-hub { opacity: 0; transform: translateY(15px); transition: all 0.8s ease; display: flex; flex-direction: column; align-items: center; }
-        header { text-align: center; margin: 40px 0 50px 0; }
-        .badge { font-size: 10px; color: var(--accent-color); letter-spacing: 3px; text-transform: uppercase; font-weight: 700; margin-bottom: 12px; display: block; }
+        /* [2] ГЛАВНЫЙ ЭКРАН (HUB) */
+        #main-hub { 
+            opacity: 0; 
+            transform: translateY(15px); 
+            transition: all 0.8s ease; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        
+        header { 
+            text-align: center; 
+            margin: 40px 0 50px 0; 
+        }
+        
+        .badge { 
+            font-size: 10px; 
+            color: var(--accent-color); 
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+            font-weight: 700; 
+            margin-bottom: 12px; 
+            display: block; 
+        }
+        
         h1 { 
-            font-size: 36px; line-height: 1.1; font-weight: 800; letter-spacing: -1.5px; 
+            font-size: 36px; 
+            line-height: 1.1; 
+            font-weight: 800; 
+            letter-spacing: -1.5px; 
             background: var(--premium-gradient); 
             background-clip: text;
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
         }
 
-        .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 380px; }
-        .hub-item { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 28px; padding: 24px 10px; display: flex; flex-direction: column; align-items: center; gap: 12px; transition: 0.3s; }
-        .hub-item:active { transform: scale(0.94); background: rgba(47, 129, 247, 0.1); }
+        .hub-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 14px; 
+            width: 100%; 
+            max-width: 380px; 
+        }
+        
+        .hub-item { 
+            background: var(--card-bg); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 28px; 
+            padding: 24px 10px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 12px; 
+            transition: 0.3s; 
+        }
+        
+        .hub-item:active { 
+            transform: scale(0.94); 
+            background: rgba(47, 129, 247, 0.1); 
+        }
 
-        /* [3] PAGES & VIEWS */
-        #inst-page, #analytics-view, #reports-archive { display: none; opacity: 0; transition: 0.4s ease; width: 100%; }
-        .back-link { color: var(--text-dim); font-size: 14px; margin-bottom: 25px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        /* [3] СТИЛИ СТРАНИЦ И КНОПОК */
+        #inst-page, #analytics-view, #reports-archive { 
+            display: none; 
+            opacity: 0; 
+            transition: 0.4s ease; 
+            width: 100%; 
+        }
+        
+        .back-link { 
+            color: var(--text-dim); 
+            font-size: 14px; 
+            margin-bottom: 25px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            cursor: pointer; 
+        }
 
-        /* ДЛИННЫЕ КНОПКИ */
         .tool-button { 
-            background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); 
-            padding: 20px; border-radius: 24px; display: flex; align-items: center; 
-            gap: 16px; margin-bottom: 12px; transition: 0.2s;
+            background: var(--card-bg); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            padding: 20px; 
+            border-radius: 24px; 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+            margin-bottom: 12px; 
+            transition: 0.2s;
         }
-        .tool-button:active { transform: scale(0.98); background: rgba(255,255,255,0.03); }
+        
+        .tool-button:active { 
+            transform: scale(0.98); 
+            background: rgba(255,255,255,0.03); 
+        }
 
-        /* ИНПУТ И КНОПКА */
         input {
-            width: 100%; background: #000; border: 1px solid rgba(255,255,255,0.1);
-            padding: 20px; border-radius: 18px; color: #fff; font-size: 16px;
-            text-align: center; outline: none; box-sizing: border-box; margin: 20px 0;
+            width: 100%; 
+            background: #000; 
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px; 
+            border-radius: 18px; 
+            color: #fff; 
+            font-size: 16px;
+            text-align: center; 
+            outline: none; 
+            box-sizing: border-box; 
+            margin: 20px 0;
         }
+        
         .btn-main {
-            width: 100%; background: #fff; color: #000; border: none;
-            padding: 20px; border-radius: 20px; font-weight: 700; font-size: 16px;
+            width: 100%; 
+            background: #fff; 
+            color: #000; 
+            border: none;
+            padding: 20px; 
+            border-radius: 20px; 
+            font-weight: 700; 
+            font-size: 16px;
         }
 
-        /* КНОПКА ОТЧЕТОВ СВЕРХУ */
         .reports-btn {
-            position: absolute; top: 0; right: 0; 
-            background: rgba(255,255,255,0.05); padding: 10px 14px; 
-            border-radius: 14px; color: var(--accent-color); 
+            position: absolute; 
+            top: 0; right: 0; 
+            background: rgba(255,255,255,0.05); 
+            padding: 10px 14px; 
+            border-radius: 14px; 
+            color: var(--accent-color); 
             border: 1px solid rgba(47, 129, 247, 0.2);
-            text-align: center;
+            text-align: center; 
+            cursor: pointer;
         }
 
         .hidden { display: none; }
@@ -103,11 +200,13 @@
             <span class="badge">Welcome to DMH</span>
             <h1>Digital Marketing<br>Helper</h1>
         </header>
+        
         <div class="hub-grid">
             <div class="hub-item" onclick="showPage('inst-page')">
                 <i class="fa-brands fa-instagram" style="font-size: 24px; color: var(--accent-color);"></i>
                 <span style="font-size: 13px; font-weight: 600;">Instagram Helper</span>
             </div>
+            
             <div class="hub-item" style="opacity: 0.3;">
                 <i class="fa-solid fa-globe" style="font-size: 24px;"></i>
                 <span style="font-size: 13px; font-weight: 600;">Web Analyzer</span>
@@ -117,17 +216,14 @@
 
     <div id="inst-page">
         <div style="position: relative; margin-bottom: 35px;">
-            <div class="back-link" onclick="showPage('main-hub')"><i class="fa-solid fa-arrow-left"></i> Hub</div>
+            <div class="back-link" onclick="showPage('main-hub')">
+                <i class="fa-solid fa-arrow-left"></i> Hub
+            </div>
             
-            <div class="reports-btn" onclick="showPage('reports-archive')">
-    <i class="fa-solid fa-folder-open"></i>
-    <span style="font-size: 9px; display: block; margin-top: 3px; color: #fff; font-weight: 700;">ОТЧЕТЫ</span>
-</div>
-
-<div class="reports-btn" onclick="loadReports().then(() => showPage('reports-archive'))">
-    <i class="fa-solid fa-folder-open"></i>
-    <span style="font-size: 9px; display: block; margin-top: 3px; color: #fff; font-weight: 700;">ОТЧЕТЫ</span>
-</div>
+            <div class="reports-btn" onclick="loadReports().then(() => showPage('reports-archive'))">
+                <i class="fa-solid fa-folder-open"></i>
+                <span style="font-size: 9px; display: block; margin-top: 3px; color: #fff; font-weight: 700;">ОТЧЕТЫ</span>
+            </div>
 
             <span class="badge" style="margin-left: 0;">Service Active</span>
             <h2 style="font-size: 32px; margin: 5px 0 0 0; letter-spacing: -1px;">Instagram Helper</h2>
@@ -153,7 +249,10 @@
     </div>
 
     <div id="analytics-view">
-        <div class="back-link" onclick="showPage('inst-page')"><i class="fa-solid fa-arrow-left"></i> Инструменты</div>
+        <div class="back-link" onclick="showPage('inst-page')">
+            <i class="fa-solid fa-arrow-left"></i> Инструменты
+        </div>
+        
         <div style="background: var(--card-bg); padding: 30px; border-radius: 32px; border: 1px solid rgba(255,255,255,0.05);">
             <h3 style="margin-top: 0;">Запуск анализа</h3>
             <p style="color: var(--text-dim); font-size: 14px;">Введите никнейм или ссылку профиля для AI-разбора</p>
@@ -163,20 +262,14 @@
     </div>
 
     <div id="reports-archive">
-        <div class="back-link" onclick="showPage('inst-page')"><i class="fa-solid fa-arrow-left"></i> Назад</div>
-        <h2 style="font-size: 28px; margin-bottom: 25px;">Мои отчеты</h2>
-        <div style="text-align: center; padding: 60px 20px; opacity: 0.4;">
-            <i class="fa-solid fa-box-archive" style="font-size: 40px; margin-bottom: 15px;"></i>
-            <p style="font-size: 14px;">Здесь будут храниться ваши отчеты.<br>Пока тут пусто.</p>
         </div>
-    </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         tg.headerColor = "#050505";
 
-        // ЛОГИКА ЗАГРУЗКИ
+        // ЛОГИКА ПРЕЛОАДЕРА
         window.onload = () => {
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
@@ -188,106 +281,110 @@
             }, 1000);
         };
 
-        // УНИВЕРСАЛЬНАЯ НАВИГАЦИЯ
+        // НАВИГАЦИЯ МЕЖДУ СТРАНИЦАМИ
         function showPage(id) {
             tg.HapticFeedback.impactOccurred('medium');
             
-            // Скрываем абсолютно всё
             const views = ['main-hub', 'inst-page', 'analytics-view', 'reports-archive'];
             views.forEach(v => {
                 document.getElementById(v).style.display = 'none';
                 document.getElementById(v).style.opacity = '0';
             });
             
-            // Показываем нужный блок
             const target = document.getElementById(id);
-            target.style.display = 'block';
-            if(id === 'main-hub') target.style.display = 'flex';
+            if (id === 'main-hub') {
+                target.style.display = 'flex';
+            } else {
+                target.style.display = 'block';
+            }
             
             setTimeout(() => {
                 target.style.opacity = '1';
             }, 50);
         }
 
-        // ЗАПУСК АНАЛИЗА
+        // ОТПРАВКА ДАННЫХ НА SERVER.PY
         async function startAI() {
-    let user = document.getElementById('username').value;
-    if(!user) return tg.showAlert("Введите никнейм!");
-    
-    // Получаем реальный ID пользователя из Telegram
-    let userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 0;
+            let user = document.getElementById('username').value;
+            if(!user) return tg.showAlert("Введите никнейм!");
+            
+            let userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 0;
 
-    tg.HapticFeedback.notificationOccurred('success');
-    tg.MainButton.setText("SENDING TO AI...").show();
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.MainButton.setText("SENDING...").show();
 
-    try {
-        // fetch отправляет данные на твой запущенный server.py
-        const response = await fetch('http://127.0.0.1:8000/analyze', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                username: user, 
-                user_id: userId 
-            })
-        });
+            try {
+                const response = await fetch('http://127.0.0.1:8000/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        username: user, 
+                        user_id: userId 
+                    })
+                });
 
-        const result = await response.json();
+                const result = await response.json();
 
-        if (result.status === "success") {
-            tg.showConfirm(
-                `Успешно!\n\n${result.message}`,
-                function(ok) {
-                    if(ok) showPage('inst-page');
+                if (result.status === "success") {
+                    tg.showConfirm(
+                        `Запрос принят!\n\n${result.message}`,
+                        function(ok) {
+                            if(ok) showPage('inst-page');
+                        }
+                    );
+                    document.getElementById('username').value = '';
                 }
-            );
+            } catch (error) {
+                tg.showAlert("Сервер Python не запущен!");
+            } finally {
+                tg.MainButton.hide();
+            }
         }
-    } catch (error) {
-        // Если server.py не запущен, вылетит эта ошибка
-        tg.showAlert("Ошибка: Сервер не отвечает. Проверь, запущен ли server.py в VS Code");
-        console.error(error);
-    } finally {
-        tg.MainButton.hide();
-    }
-}
-async function loadReports() {
-    const container = document.getElementById('reports-archive');
-    
-    try {
-        const response = await fetch('http://127.0.0.1:8000/reports');
-        const reports = await response.json();
-        
-        // Очищаем архив, оставляя только шапку
-        container.innerHTML = `
-            <div class="back-link" onclick="showPage('inst-page')"><i class="fa-solid fa-arrow-left"></i> Назад</div>
-            <h2 style="font-size: 28px; margin-bottom: 25px;">Мои отчеты</h2>
-        `;
 
-        if (reports.length === 0) {
-            container.innerHTML += `
-                <div style="text-align: center; padding: 60px 20px; opacity: 0.4;">
-                    <i class="fa-solid fa-box-archive" style="font-size: 40px; margin-bottom: 15px;"></i>
-                    <p>Пока нет отчетов</p>
-                </div>`;
-        } else {
-            // Рисуем каждый отчет из базы Python
-            reports.reverse().forEach(r => {
-                container.innerHTML += `
-                    <div class="tool-button" style="margin-bottom: 10px;">
-                        <i class="fa-solid fa-file-invoice" style="font-size: 20px; color: var(--accent-color);"></i>
-                        <div style="flex-grow: 1;">
-                            <h4 style="margin: 0; font-size: 16px;">@${r.username}</h4>
-                            <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-dim);">${r.date} • Оценка: ${r.score}</p>
-                        </div>
-                        <span style="font-size: 10px; color: #2ff771; background: rgba(47,247,113,0.1); padding: 4px 8px; border-radius: 8px;">${r.status}</span>
+        // ЗАГРУЗКА ОТЧЕТОВ ИЗ ПАМЯТИ SERVER.PY
+        async function loadReports() {
+            const container = document.getElementById('reports-archive');
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8000/reports');
+                const reports = await response.json();
+                
+                // Перерисовываем заголовок
+                container.innerHTML = `
+                    <div class="back-link" onclick="showPage('inst-page')">
+                        <i class="fa-solid fa-arrow-left"></i> Назад
                     </div>
+                    <h2 style="font-size: 28px; margin-bottom: 25px;">Мои отчеты</h2>
                 `;
-            });
+
+                if (reports.length === 0) {
+                    container.innerHTML += `
+                        <div style="text-align: center; padding: 60px 20px; opacity: 0.4;">
+                            <i class="fa-solid fa-box-archive" style="font-size: 40px; margin-bottom: 15px;"></i>
+                            <p>У вас пока нет готовых отчетов.</p>
+                        </div>`;
+                } else {
+                    // Выводим отчеты (последние сверху)
+                    reports.reverse().forEach(r => {
+                        container.innerHTML += `
+                            <div class="tool-button">
+                                <i class="fa-solid fa-file-invoice" style="font-size: 20px; color: var(--accent-color);"></i>
+                                <div style="flex-grow: 1;">
+                                    <h4 style="margin: 0; font-size: 16px;">@${r.username}</h4>
+                                    <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-dim);">
+                                        ${r.date} • Оценка: ${r.score}
+                                    </p>
+                                </div>
+                                <span style="font-size: 10px; color: #2ff771; background: rgba(47,247,113,0.1); padding: 4px 8px; border-radius: 8px;">
+                                    ${r.status}
+                                </span>
+                            </div>`;
+                    });
+                }
+            } catch (e) {
+                console.error("Ошибка загрузки:", e);
+            }
         }
-    } catch (e) {
-        tg.showAlert("Не удалось связаться с сервером для загрузки отчетов.");
-        console.error(e);
-    }
-}
     </script>
 </body>
 </html>
