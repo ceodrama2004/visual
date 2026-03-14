@@ -120,9 +120,14 @@
             <div class="back-link" onclick="showPage('main-hub')"><i class="fa-solid fa-arrow-left"></i> Hub</div>
             
             <div class="reports-btn" onclick="showPage('reports-archive')">
-                <i class="fa-solid fa-folder-open"></i>
-                <span style="font-size: 9px; display: block; margin-top: 3px; color: #fff; font-weight: 700;">ОТЧЕТЫ</span>
-            </div>
+    <i class="fa-solid fa-folder-open"></i>
+    <span style="font-size: 9px; display: block; margin-top: 3px; color: #fff; font-weight: 700;">ОТЧЕТЫ</span>
+</div>
+
+<div class="reports-btn" onclick="loadReports().then(() => showPage('reports-archive'))">
+    <i class="fa-solid fa-folder-open"></i>
+    <span style="font-size: 9px; display: block; margin-top: 3px; color: #fff; font-weight: 700;">ОТЧЕТЫ</span>
+</div>
 
             <span class="badge" style="margin-left: 0;">Service Active</span>
             <h2 style="font-size: 32px; margin: 5px 0 0 0; letter-spacing: -1px;">Instagram Helper</h2>
