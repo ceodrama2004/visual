@@ -38,7 +38,9 @@
         .loader-logo { 
             font-size: 48px; font-weight: 800; letter-spacing: 8px; 
             background: var(--premium-gradient); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            -webkit-background-clip: text;
+            background-clip: text; /* Исправленная ошибка совместимости */
+            -webkit-text-fill-color: transparent; 
         }
 
         /* [2] MAIN HUB (CENTERED) */
@@ -55,7 +57,9 @@
         h1 { 
             font-size: 38px; line-height: 1.1; font-weight: 800; letter-spacing: -1px; 
             background: var(--premium-gradient); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text; /* Исправленная ошибка совместимости */
+            -webkit-text-fill-color: transparent;
             margin: 0 auto; max-width: 300px;
         }
 
@@ -145,7 +149,7 @@
         <div class="back-link" onclick="showPage('inst-page')"><i class="fa-solid fa-chevron-left"></i> К инструментам</div>
         <div style="background: var(--card-bg); padding: 35px 25px; border-radius: 35px; border: 1px solid rgba(255,255,255,0.05); text-align: center;">
             <h3 style="margin-top: 0; font-size: 24px;">Анализ профиля</h3>
-            <p style="color: var(--text-dim); font-size: 15px;">Введите никнейм конкурента или свой</p>
+            <p style="color: var(--text-dim); font-size: 15px;">Введите никнейм для проверки</p>
             <input type="text" id="username" placeholder="username">
             <button class="btn-main" onclick="startAI()">ЗАПУСТИТЬ AI</button>
         </div>
@@ -198,25 +202,25 @@
                 tg.MainButton.hide();
                 showPage('inst-page');
             } catch(e) {
-                tg.showAlert("Сервер не отвечает");
+                tg.showAlert("Ошибка соединения с сервером");
                 tg.MainButton.hide();
             }
         }
 
         async function loadReports() {
             const container = document.getElementById('reports-archive');
-            container.innerHTML = `<div class="back-link" onclick="showPage('inst-page')">Назад</div><h2 style="font-size:30px;">Ваши отчеты</h2>`;
+            container.innerHTML = `<div class="back-link" onclick="showPage('inst-page')">Назад</div><h2 style="font-size:30px;">Архив</h2>`;
             try {
                 const response = await fetch('http://127.0.0.1:8000/reports');
                 const data = await response.json();
                 data.reverse().forEach(r => {
                     container.innerHTML += `
-                        <div class="tool-button" onclick="tg.showPopup({title:'Отчет', message:'${r.details || "В обработке"}', buttons:[{type:'close'}]})">
+                        <div class="tool-button" onclick="tg.showPopup({title:'Отчет @${r.username}', message:'Статус: ${r.status}', buttons:[{type:'close'}]})">
                             <i class="fa-solid fa-file-invoice" style="color:var(--accent-color)"></i>
-                            <div><b>@${r.username}</b><br><small style="color:var(--text-dim)">${r.date}</small></div>
+                            <div><b>@${r.username}</b><br><small style="color:var(--text-dim)">${r.date} • Оценка: ${r.score}</small></div>
                         </div>`;
                 });
-            } catch(e) {}
+            } catch(e) { container.innerHTML += "<p>Ошибка загрузки данных</p>"; }
         }
     </script>
 </body>
