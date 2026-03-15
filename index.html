@@ -315,7 +315,81 @@
         .success-title { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 10px; }
         .success-sub { font-size: 14px; color: var(--text-dim); line-height: 1.6; margin-bottom: 32px; }
 
-        /* COMMON STYLES */
+        /* [14] MY PRODUCTS SETTINGS */
+        .products-settings-btn {
+            width: 100%; background: rgba(22,27,34,0.6);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px; padding: 14px;
+            color: #8b949e; font-size: 13px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 8px; margin-top: 16px;
+            transition: 0.2s;
+        }
+        .products-settings-btn:active { background: rgba(255,255,255,0.05); }
+
+        .modal-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 500;
+            align-items: flex-end; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-sheet {
+            background: #111418; border-radius: 24px 24px 0 0;
+            padding: 20px; width: 100%; max-width: 400px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-handle {
+            width: 36px; height: 4px; background: rgba(255,255,255,0.15);
+            border-radius: 2px; margin: 0 auto 20px;
+        }
+        .modal-btn {
+            width: 100%; padding: 16px; border-radius: 16px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            border: none; margin-bottom: 10px; display: flex;
+            align-items: center; gap: 12px; transition: 0.2s;
+        }
+        .modal-btn:active { transform: scale(0.98); }
+        .modal-btn-add { background: rgba(47,129,247,0.12); color: #2f81f7; border: 1px solid rgba(47,129,247,0.2); }
+        .modal-btn-delete { background: rgba(232,64,64,0.1); color: #e84040; border: 1px solid rgba(232,64,64,0.2); }
+        .modal-btn-cancel { background: rgba(255,255,255,0.05); color: #8b949e; border: 1px solid rgba(255,255,255,0.06); }
+
+        .product-card.delete-mode {
+            border-color: rgba(47,129,247,0.4) !important;
+            box-shadow: 0 0 0 1px rgba(47,129,247,0.2);
+        }
+        .delete-circle {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: #e84040; display: flex; align-items: center;
+            justify-content: center; flex-shrink: 0; cursor: pointer;
+            margin-left: auto; transition: 0.2s;
+        }
+        .delete-circle:active { transform: scale(0.9); }
+
+        .confirm-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 600;
+            align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;
+        }
+        .confirm-overlay.active { display: flex; }
+        .confirm-box {
+            background: #111418; border-radius: 24px;
+            padding: 24px; width: 100%; max-width: 320px;
+            border: 1px solid rgba(255,255,255,0.08);
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn { from { opacity:0; transform: scale(0.95); } to { opacity:1; transform: scale(1); } }
+        .confirm-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+        .confirm-sub { font-size: 13px; color: #8b949e; line-height: 1.5; margin-bottom: 20px; }
+        .confirm-btns { display: flex; gap: 10px; }
+        .confirm-yes { flex:1; background: #e84040; color: #fff; border: none; padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .confirm-no { flex:1; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer; }
         #inst-page, #analytics-view, #reports-archive { display: none; width: 100%; max-width: 400px; }
         .back-link { color: var(--text-dim); font-size: 14px; margin-bottom: 25px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
         .tool-button { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 22px; border-radius: 26px; display: flex; align-items: center; gap: 16px; margin-bottom: 15px; }
@@ -590,6 +664,37 @@
         <div class="back-link" onclick="showPage('main-hub')"><i class="fa-solid fa-chevron-left"></i> Назад</div>
         <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 20px;">My Products</h2>
         <div id="products-list"></div>
+        <button class="products-settings-btn" onclick="openProductsSettings()">
+            <i class="fa-solid fa-gear"></i> Settings
+        </button>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="products-modal" onclick="closeProductsSettings(event)">
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <button class="modal-btn modal-btn-add" onclick="addProjectFromSettings()">
+                <i class="fa-solid fa-plus"></i> Add Project
+            </button>
+            <button class="modal-btn modal-btn-delete" onclick="enterDeleteMode()">
+                <i class="fa-solid fa-trash"></i> Delete Project
+            </button>
+            <button class="modal-btn modal-btn-cancel" onclick="closeProductsSettings()">
+                Отмена
+            </button>
+        </div>
+    </div>
+
+    <!-- CONFIRM DELETE MODAL -->
+    <div class="confirm-overlay" id="confirm-modal">
+        <div class="confirm-box">
+            <div class="confirm-title">Удалить проект?</div>
+            <div class="confirm-sub" id="confirm-text"></div>
+            <div class="confirm-btns">
+                <button class="confirm-no" onclick="cancelDelete()">No</button>
+                <button class="confirm-yes" onclick="confirmDelete()">Yes</button>
+            </div>
+        </div>
     </div>
 
     <!-- PRODUCT DETAIL PAGE -->
@@ -657,6 +762,7 @@
                     document.getElementById('main-hub').style.opacity = '1';
                     document.getElementById('main-hub').style.transform = 'translateY(0)';
                     checkMyProducts();
+                    initChatScroll();
                 }, 600);
             }, 1000);
         };
@@ -692,8 +798,16 @@
             div.className = 'msg ' + role;
             div.textContent = text;
             box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
+            if (!userScrolled) box.scrollTop = box.scrollHeight;
             return div;
+        }
+
+        function initChatScroll() {
+            const box = document.getElementById('chat-box');
+            box.addEventListener('scroll', () => {
+                const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+                userScrolled = !atBottom;
+            });
         }
 
         function addTypingIndicator() {
@@ -756,19 +870,18 @@
             }
         }
 
+        let userScrolled = false;
+
         function typewriterEffect(element, text, speed = 18) {
             return new Promise(resolve => {
                 let i = 0;
                 element.textContent = '';
+                const container = element.closest('.chat-container');
                 const iv = setInterval(() => {
-                    if (stopRequested) {
-                        clearInterval(iv);
-                        resolve();
-                        return;
-                    }
+                    if (stopRequested) { clearInterval(iv); resolve(); return; }
                     element.textContent += text[i];
                     i++;
-                    element.closest('.chat-container').scrollTop = 99999;
+                    if (!userScrolled) container.scrollTop = 99999;
                     if (i >= text.length) { clearInterval(iv); resolve(); }
                 }, speed);
             });
@@ -779,6 +892,7 @@
             const userText = input.value.trim();
             if (!userText) return;
 
+            userScrolled = false;
             addMessage(userText, 'user');
             input.value = '';
             stopRequested = false;
@@ -943,28 +1057,87 @@ ${budgetLine}
             btn.textContent = 'СОЗДАТЬ И ПОЛУЧИТЬ СТРАТЕГИЮ →';
         }
 
-        function renderProductsList() {
+        let deleteMode = false;
+        let productToDelete = null;
+
+        function renderProductsList(isDeleteMode = false) {
             const products = JSON.parse(localStorage.getItem('dmh_products') || '[]');
             const list = document.getElementById('products-list');
             if (products.length === 0) {
                 list.innerHTML = `<div class="empty-state">
                     <i class="fa-solid fa-box-open"></i>
-                    <p>Пока нет продуктов.<br>Нажми "Создать продукт" чтобы начать!</p>
+                    <p>Пока нет продуктов.<br>Нажми Settings → Add Project чтобы начать!</p>
                 </div>`;
                 return;
             }
             list.innerHTML = products.map(p => `
-                <div class="product-card" onclick="openProduct(${p.id})">
+                <div class="product-card ${isDeleteMode ? 'delete-mode' : ''}" 
+                     onclick="${isDeleteMode ? '' : `openProduct(${p.id})`}"
+                     style="${isDeleteMode ? 'cursor:default;' : ''}">
                     <div class="product-icon">
                         <i class="fa-solid fa-rocket" style="font-size:18px; color: var(--accent-color);"></i>
                     </div>
-                    <div>
+                    <div style="flex:1;">
                         <div class="product-name">${p.name}</div>
                         <div class="product-meta">${p.market} · ${p.goal} · ${p.createdAt}</div>
                     </div>
-                    <i class="fa-solid fa-chevron-right" style="opacity:0.3; margin-left:auto;"></i>
+                    ${isDeleteMode
+                        ? `<div class="delete-circle" onclick="askDeleteProduct(${p.id}, '${p.name.replace(/'/g, "\\'")}')">
+                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                   <path d="M5 12h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+                               </svg>
+                           </div>`
+                        : `<i class="fa-solid fa-chevron-right" style="opacity:0.3; margin-left:auto;"></i>`
+                    }
                 </div>
             `).join('');
+        }
+
+        function openProductsSettings() {
+            document.getElementById('products-modal').classList.add('active');
+        }
+
+        function closeProductsSettings(e) {
+            if (!e || e.target === document.getElementById('products-modal')) {
+                document.getElementById('products-modal').classList.remove('active');
+            }
+        }
+
+        function addProjectFromSettings() {
+            closeProductsSettings();
+            showPage('create-product-page');
+        }
+
+        function enterDeleteMode() {
+            closeProductsSettings();
+            deleteMode = true;
+            renderProductsList(true);
+        }
+
+        function askDeleteProduct(id, name) {
+            productToDelete = id;
+            document.getElementById('confirm-text').textContent = `Точно хотите удалить проект "${name}"? Это действие нельзя отменить.`;
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+
+        function confirmDelete() {
+            if (!productToDelete) return;
+            let products = JSON.parse(localStorage.getItem('dmh_products') || '[]');
+            products = products.filter(p => p.id !== productToDelete);
+            localStorage.setItem('dmh_products', JSON.stringify(products));
+            productToDelete = null;
+            document.getElementById('confirm-modal').classList.remove('active');
+            deleteMode = false;
+            if (products.length === 0) document.getElementById('my-products-btn').style.display = 'none';
+            renderProductsList(false);
+            try { tg.HapticFeedback.notificationOccurred('warning'); } catch(e) {}
+        }
+
+        function cancelDelete() {
+            productToDelete = null;
+            document.getElementById('confirm-modal').classList.remove('active');
+            deleteMode = false;
+            renderProductsList(false);
         }
 
         function openProduct(id) {
