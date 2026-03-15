@@ -184,16 +184,7 @@
         const GROQ_API_KEY = "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";
         // ============================
 
-        const SYSTEM_PROMPT = `Ты — DMH Assistant, профессиональный AI-ассистент по digital маркетингу. 
-Ты помогаешь маркетологам и предпринимателям с:
-- Созданием контент-планов для Instagram и других соцсетей
-- Анализом конкурентов и целевой аудитории
-- Разработкой стратегий продвижения и запуска продуктов
-- Написанием текстов для постов, сторис и рекламы
-- Go-to-market стратегиями
-
-Отвечай на русском языке. Будь конкретным и давай практические советы. 
-Если пользователь описывает свой продукт или нишу — сразу предлагай конкретные шаги.`;
+        const SYSTEM_PROMPT = "Ты — DMH Assistant, профессиональный AI-ассистент по digital маркетингу. Помогаешь маркетологам и предпринимателям с контент-планами, анализом конкурентов, стратегиями продвижения и запуска продуктов. Отвечай на русском языке. Будь конкретным и давай практические советы.";
 
         // История диалога для памяти чата
         let chatHistory = [];
@@ -213,7 +204,7 @@
         };
 
         function showPage(id) {
-            tg.HapticFeedback.impactOccurred('light');
+            try { tg.HapticFeedback.impactOccurred('light'); } catch(e) {}
             ['main-hub', 'inst-page', 'analytics-view', 'chat-page'].forEach(p => {
                 document.getElementById(p).style.display = 'none';
             });
@@ -256,7 +247,7 @@
                         'Authorization': `Bearer ${GROQ_API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: 'llama3-8b-8192',
+                        model: 'llama-3.1-8b-instant',
                         messages: [
                             { role: 'system', content: SYSTEM_PROMPT },
                             ...chatHistory
@@ -267,23 +258,21 @@
                 });
 
                 const data = await response.json();
-                const reply = data.choices?.[0]?.message?.content || 'Не смог получить ответ, попробуй ещё раз.';
 
-                // Убираем "Думаю..." и показываем ответ
-                typingDiv.remove();
-                addMessage(reply, 'ai');
-
-                // Сохраняем ответ в историю
-                chatHistory.push({ role: 'assistant', content: reply });
-
-                // Ограничиваем историю последними 20 сообщениями чтобы не перегружать
-                if (chatHistory.length > 20) {
-                    chatHistory = chatHistory.slice(-20);
+                if (data.error) {
+                    typingDiv.remove();
+                    addMessage('Ошибка: ' + data.error.message, 'ai');
+                } else {
+                    const reply = data.choices[0].message.content;
+                    typingDiv.remove();
+                    addMessage(reply, 'ai');
+                    chatHistory.push({ role: 'assistant', content: reply });
+                    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
                 }
 
             } catch(e) {
                 typingDiv.remove();
-                addMessage('Ошибка соединения. Проверь интернет и попробуй ещё раз.', 'ai');
+                addMessage('Ошибка соединения: ' + e.message, 'ai');
             }
 
             sendBtn.disabled = false;
@@ -292,8 +281,11 @@
 
         async function startAI() {
             const user = document.getElementById('username').value.trim();
-            if (!user) return tg.showAlert("Введи никнейм профиля");
-            tg.showAlert("Функция анализа профиля скоро будет доступна!");
+            if (!user) {
+                try { tg.showAlert("Введи никнейм профиля"); } catch(e) { alert("Введи никнейм профиля"); }
+                return;
+            }
+            try { tg.showAlert("Функция анализа профиля скоро будет доступна!"); } catch(e) { alert("Скоро!"); }
         }
     </script>
 </body>
