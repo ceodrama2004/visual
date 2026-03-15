@@ -103,15 +103,17 @@
         .msg { padding: 14px 18px; border-radius: 22px; max-width: 85%; font-size: 15px; line-height: 1.4; }
         .msg.ai { background: var(--card-bg); align-self: flex-start; border-bottom-left-radius: 5px; }
         .msg.user { background: var(--accent-color); align-self: flex-end; border-bottom-right-radius: 5px; }
+        .msg.typing { opacity: 0.6; font-style: italic; }
         
         .chat-input-area { display: flex; gap: 10px; background: #000; padding: 10px; border-radius: 20px; border: 1px solid #222; }
         .chat-input-area input { flex-grow: 1; background: transparent; border: none; color: #fff; padding: 10px; font-size: 16px; outline: none; margin: 0; text-align: left; }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* COMMON STYLES */
         #inst-page, #analytics-view, #reports-archive { display: none; width: 100%; max-width: 400px; }
         .back-link { color: var(--text-dim); font-size: 14px; margin-bottom: 25px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
         .tool-button { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 22px; border-radius: 26px; display: flex; align-items: center; gap: 16px; margin-bottom: 15px; }
-        .btn-main { background: #fff; color: #000; border: none; padding: 15px 25px; border-radius: 18px; font-weight: 700; }
+        .btn-main { background: #fff; color: #000; border: none; padding: 15px 25px; border-radius: 18px; font-weight: 700; cursor: pointer; }
         input[type="text"] { width: 100%; background: #000; border: 1px solid #333; padding: 20px; border-radius: 20px; color: #fff; margin: 20px 0; box-sizing: border-box; text-align: center; }
     </style>
 </head>
@@ -147,11 +149,11 @@
     <div id="chat-page">
         <div class="back-link" onclick="showPage('main-hub')"><i class="fa-solid fa-chevron-left"></i> Назад</div>
         <div class="chat-container" id="chat-box">
-            <div class="msg ai">Привет! Я твой AI ассистент. Могу помочь с контент-планом или тактикой продвижения. Что тебя интересует?</div>
+            <div class="msg ai">Привет! Я твой AI ассистент по маркетингу. Могу помочь с контент-планом, анализом конкурентов или стратегией продвижения. Что тебя интересует?</div>
         </div>
         <div class="chat-input-area">
-            <input type="text" id="chat-user-input" placeholder="Задать вопрос...">
-            <button class="btn-main" onclick="sendChatMessage()">ОТПРАВИТЬ</button>
+            <input type="text" id="chat-user-input" placeholder="Задать вопрос..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+            <button class="btn-main" id="send-btn" onclick="sendChatMessage()">ОТПРАВИТЬ</button>
         </div>
     </div>
 
@@ -177,6 +179,25 @@
     </div>
 
     <script>
+        // ============================
+        // ВСТАВЬ СЮДА СВОЙ КЛЮЧ GROQ:
+        const GROQ_API_KEY = "ВСТАВЬ_КЛЮЧ_СЮДА";
+        // ============================
+
+        const SYSTEM_PROMPT = `Ты — DMH Assistant, профессиональный AI-ассистент по digital маркетингу. 
+Ты помогаешь маркетологам и предпринимателям с:
+- Созданием контент-планов для Instagram и других соцсетей
+- Анализом конкурентов и целевой аудитории
+- Разработкой стратегий продвижения и запуска продуктов
+- Написанием текстов для постов, сторис и рекламы
+- Go-to-market стратегиями
+
+Отвечай на русском языке. Будь конкретным и давай практические советы. 
+Если пользователь описывает свой продукт или нишу — сразу предлагай конкретные шаги.`;
+
+        // История диалога для памяти чата
+        let chatHistory = [];
+
         let tg = window.Telegram.WebApp;
         tg.expand();
 
@@ -200,36 +221,79 @@
             target.style.display = id === 'chat-page' ? 'flex' : 'block';
         }
 
+        function addMessage(text, role) {
+            const box = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            div.className = 'msg ' + role;
+            div.textContent = text;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+            return div;
+        }
+
         async function sendChatMessage() {
             const input = document.getElementById('chat-user-input');
-            const box = document.getElementById('chat-box');
-            if(!input.value) return;
+            const sendBtn = document.getElementById('send-btn');
+            const userText = input.value.trim();
+            if (!userText) return;
 
-            const userText = input.value;
-            box.innerHTML += `<div class="msg user">${userText}</div>`;
+            // Показываем сообщение пользователя
+            addMessage(userText, 'user');
             input.value = '';
-            box.scrollTop = box.scrollHeight;
+            sendBtn.disabled = true;
+
+            // Добавляем в историю
+            chatHistory.push({ role: 'user', content: userText });
+
+            // Индикатор загрузки
+            const typingDiv = addMessage('Думаю...', 'ai typing');
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/chat', {
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({message: userText})
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${GROQ_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'llama3-8b-8192',
+                        messages: [
+                            { role: 'system', content: SYSTEM_PROMPT },
+                            ...chatHistory
+                        ],
+                        max_tokens: 1024,
+                        temperature: 0.7
+                    })
                 });
+
                 const data = await response.json();
-                box.innerHTML += `<div class="msg ai">${data.reply}</div>`;
+                const reply = data.choices?.[0]?.message?.content || 'Не смог получить ответ, попробуй ещё раз.';
+
+                // Убираем "Думаю..." и показываем ответ
+                typingDiv.remove();
+                addMessage(reply, 'ai');
+
+                // Сохраняем ответ в историю
+                chatHistory.push({ role: 'assistant', content: reply });
+
+                // Ограничиваем историю последними 20 сообщениями чтобы не перегружать
+                if (chatHistory.length > 20) {
+                    chatHistory = chatHistory.slice(-20);
+                }
+
             } catch(e) {
-                box.innerHTML += `<div class="msg ai">Извини, сервер не отвечает. Попробуй позже!</div>`;
+                typingDiv.remove();
+                addMessage('Ошибка соединения. Проверь интернет и попробуй ещё раз.', 'ai');
             }
-            box.scrollTop = box.scrollHeight;
+
+            sendBtn.disabled = false;
+            input.focus();
         }
 
         async function startAI() {
-            const user = document.getElementById('username').value;
-            if(!user) return tg.showAlert("Ник не введен");
-            tg.MainButton.setText("АНАЛИЗ...").show();
-            // ... логика fetch как была раньше
-            setTimeout(() => { tg.MainButton.hide(); tg.showAlert("Запрос отправлен"); showPage('inst-page'); }, 1500);
+            const user = document.getElementById('username').value.trim();
+            if (!user) return tg.showAlert("Введи никнейм профиля");
+            tg.showAlert("Функция анализа профиля скоро будет доступна!");
         }
     </script>
 </body>
