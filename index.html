@@ -149,6 +149,7 @@
         }
         .send-btn:active { transform: scale(0.92); }
         .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .send-btn.stop { background: #e84040; }
 
         /* [5] QUICK SUGGESTIONS */
         .suggestions {
@@ -253,7 +254,28 @@
         const GROQ_API_KEY = "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";
         // ============================
 
-        const SYSTEM_PROMPT = "Ты — DMH Assistant, профессиональный AI-ассистент по digital маркетингу. Помогаешь маркетологам и предпринимателям с контент-планами, анализом конкурентов, стратегиями продвижения и запуска продуктов. Отвечай на русском языке. Будь конкретным и давай практические советы.";
+        const SYSTEM_PROMPT = `Ты — DMH Assistant, личный маркетинговый помощник в приложении Digital Marketing Helper.
+
+Твоя главная задача: помочь любому человеку — от школьника до опытного маркетолога — развить свой бренд или продукт. Говори так, чтобы даже тот, кто никогда не занимался маркетингом, всё понял с первого раза.
+
+КАК ТЫ ОТВЕЧАЕШЬ:
+- Коротко и по делу. Никакой воды и общих фраз.
+- Простым языком — без сложных терминов. Если термин нужен — сразу объясни его в одном предложении.
+- Дружелюбно и с энергией, как будто помогает старший друг который разбирается в теме.
+- Всегда конкретно: не "нужно делать контент", а "делай 3 поста в неделю: пн — польза, ср — история, пт — продажа".
+- Если вопрос широкий — задай 1 уточняющий вопрос, чтобы дать точный ответ. Не пиши простыни текста вслепую.
+- Структурируй ответ: короткий вывод → конкретные шаги (если нужно).
+- Максимальная длина ответа — примерно 150-200 слов. Лучше меньше, но точнее.
+
+ЧЕМ ТЫ ПОМОГАЕШЬ:
+- Контент-планы для Instagram, TikTok, YouTube
+- Анализ конкурентов и целевой аудитории
+- Стратегия запуска продукта или бренда с нуля
+- Тексты для постов, сторис, рекламы
+- Советы по таргету, коллаборациям, росту аудитории
+
+Отвечай только на русском языке.`;
+
 
         // История диалога для памяти чата
         let chatHistory = [];
@@ -310,11 +332,33 @@
             return div;
         }
 
+        let stopRequested = false;
+
+        function setSendBtn(mode) {
+            const btn = document.getElementById('send-btn');
+            if (mode === 'stop') {
+                btn.classList.add('stop');
+                btn.disabled = false;
+                btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>`;
+                btn.onclick = () => { stopRequested = true; };
+            } else {
+                btn.classList.remove('stop');
+                btn.disabled = false;
+                btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+                btn.onclick = sendChatMessage;
+            }
+        }
+
         function typewriterEffect(element, text, speed = 18) {
             return new Promise(resolve => {
                 let i = 0;
                 element.textContent = '';
                 const iv = setInterval(() => {
+                    if (stopRequested) {
+                        clearInterval(iv);
+                        resolve();
+                        return;
+                    }
                     element.textContent += text[i];
                     i++;
                     element.closest('.chat-container').scrollTop = 99999;
@@ -325,13 +369,13 @@
 
         async function sendChatMessage() {
             const input = document.getElementById('chat-user-input');
-            const sendBtn = document.getElementById('send-btn');
             const userText = input.value.trim();
             if (!userText) return;
 
             addMessage(userText, 'user');
             input.value = '';
-            sendBtn.disabled = true;
+            stopRequested = false;
+            setSendBtn('stop');
 
             chatHistory.push({ role: 'user', content: userText });
 
@@ -373,10 +417,10 @@
 
             } catch(e) {
                 typingDiv.remove();
-                addMessage('Ошибка соединения: ' + e.message, 'ai');
+                if (!stopRequested) addMessage('Ошибка соединения: ' + e.message, 'ai');
             }
 
-            sendBtn.disabled = false;
+            setSendBtn('send');
             input.focus();
         }
 
